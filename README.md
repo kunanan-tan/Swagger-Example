@@ -1,2 +1,4 @@
 # Example-Swagger
-example swagger (http://localhost:9000/swagger-ui.html)
+example swagger
+run maven pj
+and test (http://localhost:9000/swagger-ui.html)
