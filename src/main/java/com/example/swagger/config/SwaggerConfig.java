@@ -1,47 +1,39 @@
 package com.example.swagger.config;
 
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import springfox.documentation.builders.ApiInfoBuilder;
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.service.ApiInfo;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
 /**
+ * springdoc-openapi (OpenAPI 3) replacement for the abandoned springfox {@code Docket}.
  *
  * @author kunanan.t
  */
-
-
 @Configuration
-@EnableSwagger2
-@ComponentScan("com.example.swagger.controller")
 public class SwaggerConfig {
+
+    private static final String BASIC_AUTH = "basicAuth";
 
     @Value("${initial.version}")
     private String version;
 
     @Bean
-    public Docket apiInfo() {
-        return new Docket(DocumentationType.SWAGGER_2)
-                .select()
-                .apis(RequestHandlerSelectors.basePackage("com.example.swagger.controller"))
-                .paths(PathSelectors.regex("/.*"))
-                .build().apiInfo(apiEndPointsInfo());
-
+    public OpenAPI apiInfo() {
+        return new OpenAPI()
+                .info(new Info()
+                        .title("Example Swagger")
+                        .description("API DOCUMENT")
+                        .version(version)
+                        .license(new License().name("Kunanan").url("https://github.com/kunanan-tan")))
+                .components(new Components().addSecuritySchemes(BASIC_AUTH, new SecurityScheme()
+                        .type(SecurityScheme.Type.HTTP)
+                        .scheme("basic")))
+                .addSecurityItem(new SecurityRequirement().addList(BASIC_AUTH));
     }
-
-    private ApiInfo apiEndPointsInfo() {
-        return new ApiInfoBuilder().title("Example Swagger")
-                .description("API DOCUMENT")
-                .license("Kunanan")
-                .licenseUrl("https://github.com/kunanan-tan")
-                .version(version)
-                .build();
-    }
-
 }

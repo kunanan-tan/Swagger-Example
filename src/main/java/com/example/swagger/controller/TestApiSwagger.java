@@ -1,12 +1,17 @@
 package com.example.swagger.controller;
 
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author kunanan.t
@@ -17,20 +22,19 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class TestApiSwagger {
 
-    @ApiOperation(value = "", notes = "Test Swagger")
-    @GetMapping(value = "/testSwagger")
-    public ResponseEntity<Object>  getTestSwagger(
-            // check authen not used
-//            @RequestHeader(value = "Authorization", required = true) String authorization,
-            @RequestHeader(value = "version", required = false) String apiVersion,
+    /**
+     * The old {@code try/catch (Exception) -> 500} wrapper swallowed the cause and defeated the
+     * global error handling; unexpected failures now surface through Spring's handler.
+     */
+    @Operation(summary = "Test Swagger", description = "Echoes the supplied testId")
+    @GetMapping("/testSwagger")
+    public ResponseEntity<Long> getTestSwagger(
+            @Parameter(description = "API version") @RequestHeader(value = "version", required = false) String apiVersion,
             @RequestHeader(value = "accept-language", required = false) String language,
-            @RequestParam(value = "testId", required = true) Long testId) throws Exception {
-        try {
-            return ResponseEntity.ok(testId);
-        } catch (Exception e) {
-            log.error(e.getLocalizedMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+            @RequestParam @NotNull @Positive Long testId) {
+
+        log.debug("testSwagger called version={} language={} testId={}", apiVersion, language, testId);
+        return ResponseEntity.ok(testId);
     }
 
 }
